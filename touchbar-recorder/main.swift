@@ -8,3 +8,14 @@
 
 import Foundation
 
+var outputPath = "~/Movies/Touchbar Recording.mp4"
+
+print("Recording your touchbar... Hit ctrl-c to stop.")
+
+signal(SIGINT) { _ in
+    print("\u{0008}\u{0008}", terminator: "")
+    print("Saving video...")
+    print("All done. The video is at \(outputPath)")
+}
+sigsuspend(nil)
+
