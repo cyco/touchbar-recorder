@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		83570C05203B6E5100D65039 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83570C04203B6E5100D65039 /* main.swift */; };
+		83570C10203B743400D65039 /* DFR.m in Sources */ = {isa = PBXBuildFile; fileRef = 83570C0F203B743400D65039 /* DFR.m */; };
+		83570C13203B752600D65039 /* DFRFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83570C12203B752600D65039 /* DFRFoundation.framework */; };
+		83570C19203B759600D65039 /* SkyLight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83570C18203B759600D65039 /* SkyLight.framework */; };
+		838A7F84203CB9950084F71C /* TouchbarRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 838A7F83203CB9950084F71C /* TouchbarRecorder.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +29,15 @@
 /* Begin PBXFileReference section */
 		83570C01203B6E5100D65039 /* touchbar-recorder */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "touchbar-recorder"; sourceTree = BUILT_PRODUCTS_DIR; };
 		83570C04203B6E5100D65039 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		83570C0D203B743300D65039 /* touchbar-recorder-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "touchbar-recorder-Bridging-Header.h"; sourceTree = "<group>"; };
+		83570C0E203B743400D65039 /* DFR.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFR.h; sourceTree = "<group>"; };
+		83570C0F203B743400D65039 /* DFR.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DFR.m; sourceTree = "<group>"; };
+		83570C12203B752600D65039 /* DFRFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DFRFoundation.framework; path = ../../../../System/Library/PrivateFrameworks/DFRFoundation.framework; sourceTree = "<group>"; };
+		83570C14203B753E00D65039 /* DFRDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DFRDisplay.framework; path = ../../../../System/Library/PrivateFrameworks/DFRDisplay.framework; sourceTree = "<group>"; };
+		83570C16203B755800D65039 /* DFRBrightness.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DFRBrightness.framework; path = ../../../../System/Library/PrivateFrameworks/DFRBrightness.framework; sourceTree = "<group>"; };
+		83570C18203B759600D65039 /* SkyLight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SkyLight.framework; path = ../../../../System/Library/PrivateFrameworks/SkyLight.framework; sourceTree = "<group>"; };
+		838A7F82203CB9950084F71C /* TouchbarRecorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TouchbarRecorder.h; sourceTree = "<group>"; };
+		838A7F83203CB9950084F71C /* TouchbarRecorder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TouchbarRecorder.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +45,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83570C19203B759600D65039 /* SkyLight.framework in Frameworks */,
+				83570C13203B752600D65039 /* DFRFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -43,6 +58,7 @@
 			children = (
 				83570C03203B6E5100D65039 /* touchbar-recorder */,
 				83570C02203B6E5100D65039 /* Products */,
+				83570C11203B752600D65039 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -58,8 +74,24 @@
 			isa = PBXGroup;
 			children = (
 				83570C04203B6E5100D65039 /* main.swift */,
+				83570C0E203B743400D65039 /* DFR.h */,
+				83570C0F203B743400D65039 /* DFR.m */,
+				83570C0D203B743300D65039 /* touchbar-recorder-Bridging-Header.h */,
+				838A7F82203CB9950084F71C /* TouchbarRecorder.h */,
+				838A7F83203CB9950084F71C /* TouchbarRecorder.m */,
 			);
 			path = "touchbar-recorder";
+			sourceTree = "<group>";
+		};
+		83570C11203B752600D65039 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				83570C18203B759600D65039 /* SkyLight.framework */,
+				83570C16203B755800D65039 /* DFRBrightness.framework */,
+				83570C14203B753E00D65039 /* DFRDisplay.framework */,
+				83570C12203B752600D65039 /* DFRFoundation.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -94,6 +126,7 @@
 				TargetAttributes = {
 					83570C00203B6E5100D65039 = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -120,7 +153,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83570C10203B743400D65039 /* DFR.m in Sources */,
 				83570C05203B6E5100D65039 /* main.swift in Sources */,
+				838A7F84203CB9950084F71C /* TouchbarRecorder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,8 +271,16 @@
 		83570C09203B6E5100D65039 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "touchbar-recorder/touchbar-recorder-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -245,8 +288,15 @@
 		83570C0A203B6E5100D65039 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "touchbar-recorder/touchbar-recorder-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;

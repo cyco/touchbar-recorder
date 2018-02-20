@@ -8,14 +8,12 @@
 
 import Foundation
 
-var outputPath = "~/Movies/Touchbar Recording.mp4"
+let outputPath = "/Users/chris/Movies/Touchbar Recording.mp4"
+let recorder = TouchbarRecorder()
 
-print("Recording your touchbar... Hit ctrl-c to stop.")
-
-signal(SIGINT) { _ in
-    print("\u{0008}\u{0008}", terminator: "")
-    print("Saving video...")
-    print("All done. The video is at \(outputPath)")
+recorder.start()
+while recorder.isRecording {
+    RunLoop.main.run(mode: .defaultRunLoopMode, before: Date(timeIntervalSinceNow: 0.01))
 }
-sigsuspend(nil)
 
+recorder.write(to: URL(fileURLWithPath: outputPath))
