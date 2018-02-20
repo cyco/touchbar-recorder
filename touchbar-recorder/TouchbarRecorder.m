@@ -41,28 +41,21 @@
     __block NSInteger frames = 0;
     
     self.stream = [DFR DisplayStreamCreate:0 queue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0) handler:^(CGDisplayStreamFrameStatus status, uint64_t displayTime, IOSurfaceRef  _Nullable frameSurface, CGDisplayStreamUpdateRef  _Nullable updateRef) {
-        NSLog(@"callback");
         if(!self.isRecording) return;
         
         if (self.writer.status == AVAssetWriterStatusUnknown) {
-            NSLog(@"unknonw status");
-
             [self.writer startWriting];
             [self.writer startSessionAtSourceTime:kCMTimeZero];
         }
         
         if(self.writer.status == AVAssetWriterStatusFailed) {
-            NSLog(@"status is failed");
             return;
         }
         
         if(!frameSurface) {
-            NSLog(@"no surface");
             return;
         }
         if(status != kCGDisplayStreamFrameStatusFrameComplete) {
-         
-            NSLog(@"not a complete frame");
             return;
         }
         
@@ -76,12 +69,10 @@
         CVPixelBufferRetain(pixelBuffer);
         
         if(ret != kCVReturnSuccess) {
-            NSLog(@"Could not create pixel buffer");
             return;
         }
         
         while(!_adaptor.assetWriterInput.isReadyForMoreMediaData) {
-            NSLog(@"waiting for asset writer");
             CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.01, true);
         }
         
@@ -89,7 +80,6 @@
         CVPixelBufferRelease(pixelBuffer);
         
         if(frames > 30) {
-            NSLog(@"stopping on main");
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [self stop];
             });
@@ -102,7 +92,6 @@
 }
 
 - (void)stop {
-    NSLog(@"stopping");
     if(self.stream) {
         CGDisplayStreamStop(self.stream);
         self.stream = NULL;
@@ -111,7 +100,6 @@
     __block BOOL finishedWriting = NO;
     [self.writer finishWritingWithCompletionHandler:^{
         finishedWriting = YES;
-        NSLog(@"finished writing");
     }];
     
     while(!finishedWriting) {
@@ -119,13 +107,9 @@
     }
     
     _isRecording = NO;
-    NSLog(@"stopped");
 }
 
 - (void)writeTo:(NSURL*)url {
-    NSLog(@"writeTo");
-    NSError *error = nil;
-    [[NSFileManager defaultManager] moveItemAtURL:self.outputFile toURL:url error:&error];
-    NSLog(@"%@", error);
+    [[NSFileManager defaultManager] moveItemAtURL:self.outputFile toURL:url error:nil];
 }
 @end
