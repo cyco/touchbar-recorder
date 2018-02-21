@@ -34,9 +34,7 @@
                          AVVideoHeightKey: @(size.height  * 2)
                          }];
     self.videoInput.expectsMediaDataInRealTime = YES;
-    self.adaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:self.videoInput sourcePixelBufferAttributes:@{
-                                                                                                                                                              
-                                                                                                                                                              }];
+    self.adaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:self.videoInput sourcePixelBufferAttributes:@{}];
     [self.writer addInput:self.videoInput];
     __block NSInteger frames = 0;
     
@@ -45,7 +43,7 @@
         
         if (self.writer.status == AVAssetWriterStatusUnknown) {
             [self.writer startWriting];
-            [self.writer startSessionAtSourceTime:kCMTimeZero];
+            [self.writer startSessionAtSourceTime:CMTimeMake(displayTime, 30 / 1000.0)];
         }
         
         if(self.writer.status == AVAssetWriterStatusFailed) {
@@ -76,10 +74,10 @@
             CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.01, true);
         }
         
-        [self.adaptor appendPixelBuffer:pixelBuffer withPresentationTime:CMTimeMake(frames++, 60)];
+        [self.adaptor appendPixelBuffer:pixelBuffer withPresentationTime:CMTimeMake(displayTime, 30 / 1000.0)];
         CVPixelBufferRelease(pixelBuffer);
         
-        if(frames > 30) {
+        if(frames > 300) {
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [self stop];
             });
