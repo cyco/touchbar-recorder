@@ -3,4 +3,4 @@
 //
 
 #import "DFR.h"
-#import "TouchbarRecorder.h"
+#import "SurfaceRecorder.h"

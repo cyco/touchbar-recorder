@@ -14,7 +14,7 @@ CGDisplayStreamRef SLSDFRDisplayStreamCreate(int displayID, dispatch_queue_t que
 CGSize DFRGetScreenSize(void);
 
 @implementation DFR
-+ (void* _Nullable)DisplayStreamCreate:(int)displayID queue:(dispatch_queue_t)queue handler: (CGDisplayStreamFrameAvailableHandler)handler {
++ (CGDisplayStreamRef)DisplayStreamCreate:(int)displayID queue:(dispatch_queue_t)queue handler: (CGDisplayStreamFrameAvailableHandler)handler {
     return SLSDFRDisplayStreamCreate(displayID, queue, handler);
 }
 

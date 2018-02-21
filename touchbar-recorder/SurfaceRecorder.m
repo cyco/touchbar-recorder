@@ -51,7 +51,6 @@
         self.startTime = displayTime;
     }
     
-    
     if(self.writer.status == AVAssetWriterStatusFailed) {
         return;
     }

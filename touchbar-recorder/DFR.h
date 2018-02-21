@@ -9,6 +9,6 @@
 #import <Foundation/Foundation.h>
 
 @interface DFR : NSObject
-+ (void* _Nullable)DisplayStreamCreate:(int)displayID queue:(dispatch_queue_t _Nullable)queue handler: (CGDisplayStreamFrameAvailableHandler _Nullable )handler;
++ (CGDisplayStreamRef _Nullable )DisplayStreamCreate:(int)displayID queue:(dispatch_queue_t _Nullable)queue handler: (CGDisplayStreamFrameAvailableHandler _Nullable )handler;
 + (CGSize)GetScreenSize;
 @end
