@@ -63,16 +63,14 @@
 }
 
 - (void)createDisplayStream {
-    __block NSInteger frames = 0;
     __block uint64_t start;
-    
     self.stream = [DFR DisplayStreamCreate:0 queue:self.queue handler:^(CGDisplayStreamFrameStatus status, uint64_t displayTime, IOSurfaceRef  _Nullable frameSurface, CGDisplayStreamUpdateRef  _Nullable updateRef) {
         if(!self.isRecording) return;
         
         if (self.writer.status == AVAssetWriterStatusUnknown) {
             [self.writer startWriting];
             [self.writer startSessionAtSourceTime:kCMTimeZero];
-            frames = 0;
+            start = displayTime;
         }
         
         
@@ -88,14 +86,6 @@
             return;
         }
         
-        if(frames == 0) {
-            start = displayTime;
-        }
-        
-        frames++;
-        
-        uint64_t now = displayTime - start;
-        
         CVPixelBufferRef pixelBuffer;
         CVReturn ret;
         NSDictionary *pixelBufferAttributes = @{
@@ -104,7 +94,6 @@
         
         ret = CVPixelBufferCreateWithIOSurface(nil, frameSurface, (__bridge CFDictionaryRef _Nullable)(pixelBufferAttributes), &pixelBuffer);
         CVPixelBufferRetain(pixelBuffer);
-        
         if(ret != kCVReturnSuccess) {
             return;
         }
@@ -113,7 +102,7 @@
             usleep(100);
         }
         
-        [self.adaptor appendPixelBuffer:pixelBuffer withPresentationTime:CMTimeMake(now, NSEC_PER_SEC)];
+        [self.adaptor appendPixelBuffer:pixelBuffer withPresentationTime:CMTimeMake(displayTime - start, NSEC_PER_SEC)];
         CVPixelBufferRelease(pixelBuffer);
     }];
 }
