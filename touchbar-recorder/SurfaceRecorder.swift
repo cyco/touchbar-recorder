@@ -66,7 +66,6 @@ class SurfaceRecorder {
         }
         
         let now = time - startTime
-        print(Int64(now) == now, NSEC_PER_SEC == Int32(NSEC_PER_SEC))
         self.adaptor.append(unmanagedBuffer!.takeUnretainedValue(), withPresentationTime: CMTimeMake(Int64(now), Int32(NSEC_PER_SEC)))
     }
 }
