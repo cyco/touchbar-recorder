@@ -27,6 +27,33 @@ let basename = "TouchBar Recording"
 let fileExtension = "mp4"
 let output = URL(fileURLWithPath: "Movies/.mp4", isDirectory: false, relativeTo: FileManager.default.homeDirectoryForCurrentUser)
 
+func printUsage(code: Int32 = 0) {
+    print("Usage: touchbar-recorder [<options>]")
+    print("       When called without any arguments, a video of your touchbar is recorded until you press ctrl-c.")
+    print("       Output is saved to ~/Movies")
+    print("")
+    print("Options:")
+    print("    --help     Show this message")
+    print("    --version  Print version and exit")
+    print()
+    exit(code)
+}
+
+for option in CommandLine.arguments.dropFirst() {
+    switch option {
+    case "--help": fallthrough
+    case "-help": fallthrough
+    case "-h": fallthrough
+    case "-?": printUsage()
+    case "--version":
+        print("touchbar-reporter version 0.1")
+        exit(0)
+    default:
+        print("Unknown option: \(option)")
+        printUsage(code: 1)
+    }
+}
+
 print("Recording your touchbar… Hit ctrl-c to stop.")
 
 let recorder = TouchbarRecorder()

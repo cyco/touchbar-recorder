@@ -36,12 +36,13 @@ class SurfaceRecorder {
         self.videoInput = AVAssetWriterInput(mediaType: .video, outputSettings: [
             AVVideoCodecKey: AVVideoCodecType.h264,
             AVVideoWidthKey: size.width * 2,
-            AVVideoHeightKey: size.height  * 2,
+            AVVideoHeightKey: size.height * 2,
             AVVideoCompressionPropertiesKey: [
-                AVVideoMaxKeyFrameIntervalKey: 60
-            ]
+                AVVideoMaxKeyFrameIntervalKey: 60,
+                AVVideoProfileLevelKey: AVVideoProfileLevelH264High41
+            ],
             ])
-        self.videoInput.expectsMediaDataInRealTime = false
+        self.videoInput.expectsMediaDataInRealTime = true
         self.adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: self.videoInput, sourcePixelBufferAttributes: [:])
         self.writer.add(self.videoInput)
     }
