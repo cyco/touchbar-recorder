@@ -17,7 +17,7 @@ class TouchbarRecorder {
     
     init() {
         queue = DispatchQueue.global(qos: .userInitiated)
-        recorder = SurfaceRecorder()
+        recorder = SurfaceRecorder(size: DFRGetScreenSize())
     }
     
     public func start() {
@@ -26,18 +26,17 @@ class TouchbarRecorder {
         self.queue.async {
             self.stream = self.createStream()
             guard self.stream != nil else { return }
-            self.recorder.setup(for: DFR.getScreenSize())
             self.stream!.start()
         }
     }
     
     private func createStream() -> CGDisplayStream? {
-        if let stream = DFR.displayStreamCreate(0, queue: self.queue, handler: { (status, time, surface, _) in
+        if let stream = SLSDFRDisplayStreamCreate(0, self.queue, { (status, time, surface, _) in
             guard self.isRecording else { return }
             guard surface != nil else { return }
             guard status == .frameComplete else { return }
             
-            self.recorder.record(surface, at: time)
+            self.recorder.capture(surface: surface!, at: time)
         }) {
             return stream.takeUnretainedValue()
         }
@@ -46,7 +45,7 @@ class TouchbarRecorder {
     }
     
     public func stop() {
-        self.queue.async {
+        self.queue.sync {
             if let stream = self.stream {
                 stream.stop()
                 self.stream = nil
@@ -64,6 +63,5 @@ class TouchbarRecorder {
     
     public func write(to url: URL) {
         try? FileManager.default.moveItem(at: self.recorder.outputFile, to: url)
-        self.recorder.cleanup()
     }
 }
