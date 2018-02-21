@@ -12,17 +12,20 @@ let basename = "TouchBar Recording"
 let fileExtension = "mp4"
 let output = URL(fileURLWithPath: "Movies/.mp4", isDirectory: false, relativeTo: FileManager.default.homeDirectoryForCurrentUser)
 
+print("Recording your touchbar… Hit ctrl-c to stop.")
+
 let recorder = TouchbarRecorder()
 
 signal(SIGINT) { _ in
     if recorder.isRecording {
         recorder.stop()
         print("\u{0008}\u{0008}", terminator: "")
-        print("Saving video...")
+        print("Saving video…")
 
         let outputName = FileNameGenerator(basename: basename, fileExtension: fileExtension, directory: output).outputName
         recorder.write(to: URL(fileURLWithPath: outputName, relativeTo: output))
-        print("All done. The video is at ~/Movies/\(outputName)")
+        print("All done.")
+        print("The recording is at ~/Movies/\(outputName)")
     }
 }
 
