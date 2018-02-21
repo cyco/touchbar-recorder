@@ -21,30 +21,60 @@
 @end
 
 @implementation TouchbarRecorder
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        self.outputFile = [NSURL fileURLWithPathComponents:@[NSTemporaryDirectory(), [NSUUID new].UUIDString]];
+    }
+    
+    return self;
+}
+
 - (void)start {
     _isRecording = YES;
-    CGSize size = [DFR GetScreenSize];
-    self.outputFile = [NSURL fileURLWithPathComponents:@[NSTemporaryDirectory(), [NSUUID new].UUIDString]];
     
+    self.queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0) ;
+    dispatch_async(self.queue, ^{
+        [self setupAssetWriter];
+        [self createDisplayStream];
+        
+        if(self.stream) {
+            CGDisplayStreamStart(self.stream);
+        }
+    });
+}
+
+- (void)setupAssetWriter {
+    CGSize size = [DFR GetScreenSize];
     self.writer = [AVAssetWriter assetWriterWithURL:self.outputFile fileType:AVFileTypeMPEG4 error:nil];
     self.videoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:
                        @{
                          AVVideoCodecKey: AVVideoCodecTypeH264,
                          AVVideoWidthKey: @(size.width * 2),
-                         AVVideoHeightKey: @(size.height  * 2)
+                         AVVideoHeightKey: @(size.height  * 2),
+                         AVVideoCompressionPropertiesKey: @{
+                                 AVVideoMaxKeyFrameIntervalKey: @(60)
+                                 }
                          }];
     self.videoInput.expectsMediaDataInRealTime = YES;
     self.adaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:self.videoInput sourcePixelBufferAttributes:@{}];
     [self.writer addInput:self.videoInput];
+}
+
+- (void)createDisplayStream {
     __block NSInteger frames = 0;
+    __block uint64_t start;
     
-    self.stream = [DFR DisplayStreamCreate:0 queue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0) handler:^(CGDisplayStreamFrameStatus status, uint64_t displayTime, IOSurfaceRef  _Nullable frameSurface, CGDisplayStreamUpdateRef  _Nullable updateRef) {
+    self.stream = [DFR DisplayStreamCreate:0 queue:self.queue handler:^(CGDisplayStreamFrameStatus status, uint64_t displayTime, IOSurfaceRef  _Nullable frameSurface, CGDisplayStreamUpdateRef  _Nullable updateRef) {
         if(!self.isRecording) return;
         
         if (self.writer.status == AVAssetWriterStatusUnknown) {
             [self.writer startWriting];
-            [self.writer startSessionAtSourceTime:CMTimeMake(displayTime, 30 / 1000.0)];
+            [self.writer startSessionAtSourceTime:kCMTimeZero];
+            frames = 0;
         }
+        
         
         if(self.writer.status == AVAssetWriterStatusFailed) {
             return;
@@ -53,9 +83,18 @@
         if(!frameSurface) {
             return;
         }
+        
         if(status != kCGDisplayStreamFrameStatusFrameComplete) {
             return;
         }
+        
+        if(frames == 0) {
+            start = displayTime;
+        }
+        
+        frames++;
+        
+        uint64_t now = displayTime - start;
         
         CVPixelBufferRef pixelBuffer;
         CVReturn ret;
@@ -71,43 +110,44 @@
         }
         
         while(!_adaptor.assetWriterInput.isReadyForMoreMediaData) {
-            CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.01, true);
+            usleep(100);
         }
         
-        [self.adaptor appendPixelBuffer:pixelBuffer withPresentationTime:CMTimeMake(displayTime, 30 / 1000.0)];
+        [self.adaptor appendPixelBuffer:pixelBuffer withPresentationTime:CMTimeMake(now, NSEC_PER_SEC)];
         CVPixelBufferRelease(pixelBuffer);
-        
-        if(frames > 300) {
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [self stop];
-            });
-        }
     }];
-    
-    if(self.stream) {
-        CGDisplayStreamStart(self.stream);
-    }
 }
 
 - (void)stop {
-    if(self.stream) {
-        CGDisplayStreamStop(self.stream);
-        self.stream = NULL;
-    }
-    
-    __block BOOL finishedWriting = NO;
-    [self.writer finishWritingWithCompletionHandler:^{
-        finishedWriting = YES;
-    }];
-    
-    while(!finishedWriting) {
-        CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.01, true);
-    }
-    
-    _isRecording = NO;
+    dispatch_sync(self.queue, ^{
+        if(self.stream) {
+            CGDisplayStreamStop(self.stream);
+            self.stream = NULL;
+        }
+        
+        dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+        dispatch_block_t block = ^{
+            dispatch_semaphore_signal(sem);
+        };
+        [self.writer finishWritingWithCompletionHandler:block];
+        
+        _isRecording = NO;
+        while(dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)))) ;
+    });
 }
 
 - (void)writeTo:(NSURL*)url {
-    [[NSFileManager defaultManager] moveItemAtURL:self.outputFile toURL:url error:nil];
+    [[NSFileManager defaultManager] removeItemAtURL:url error:nil];
+    if([[NSFileManager defaultManager] moveItemAtURL:self.outputFile toURL:url error:nil]) {
+        self.outputFile = nil;
+    }
+    
+    [self cleanup];
+}
+
+- (void)cleanup {
+    if(self.outputFile) {
+        [[NSFileManager defaultManager] removeItemAtURL:self.outputFile error:nil];
+    }
 }
 @end
