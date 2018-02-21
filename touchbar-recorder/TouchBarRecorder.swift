@@ -66,6 +66,10 @@ class TouchbarRecorder {
                 self.stream = nil
             }
             
+            while self.recorder.writer.status == AVAssetWriterStatus.unknown {
+                usleep(100)
+            }
+            
             let semaphore = DispatchSemaphore(value: 0)
             self.recorder.writer.finishWriting {
                 semaphore.signal()
